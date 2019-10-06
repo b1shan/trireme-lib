@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	defaultDebugIntervalMilliseconds = 1000
+	defaultDebugIntervalMilliseconds = 10
 	debugContextID                   = "UNUSED"
 	debugRPCCommand                  = "ProxyRPCServer.PostPacketEvent"
 )
@@ -56,12 +56,18 @@ func (d *debugClient) sendData(records []*collector.PacketReport) error {
 			PacketRecords: records,
 		},
 	}
-	return d.rpchdl.RemoteCall(
-		debugContextID,
-		debugRPCCommand,
-		&request,
-		&rpcwrapper.Response{},
-	)
+	for i := 0; i < 10; i++ {
+		if err := d.rpchdl.RemoteCall(
+			debugContextID,
+			debugRPCCommand,
+			&request,
+			&rpcwrapper.Response{},
+		); err != nil {
+			zap.L().Error("ERROR DEBUG CLIENT")
+			<-time.After(1 * time.Microsecond)
+		}
+	}
+	return nil
 }
 
 func (d *debugClient) sendPacketReports(ctx context.Context) {

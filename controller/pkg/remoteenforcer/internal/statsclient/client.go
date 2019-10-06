@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	defaultStatsIntervalMiliseconds = 1000
+	defaultStatsIntervalMiliseconds = 10
 	defaultUserRetention            = 10
 	statsContextID                  = "UNUSED"
 	statsRPCCommand                 = "ProxyRPCServer.PostStats"
@@ -90,14 +90,15 @@ func (s *statsClient) sendRequest(flows map[string]*collector.FlowRecord, users 
 			Users: users,
 		},
 	}
-
-	if err := s.rpchdl.RemoteCall(
-		statsContextID,
-		statsRPCCommand,
-		&request,
-		&rpcwrapper.Response{},
-	); err != nil {
-		zap.L().Error("RPC failure in sending statistics: Unable to send flows", zap.Error(err))
+	for i := 0; i < 10; i++ {
+		if err := s.rpchdl.RemoteCall(
+			statsContextID,
+			statsRPCCommand,
+			&request,
+			&rpcwrapper.Response{},
+		); err != nil {
+			zap.L().Error("RPC failure in sending statistics: Unable to send flows", zap.Error(err))
+		}
 	}
 }
 

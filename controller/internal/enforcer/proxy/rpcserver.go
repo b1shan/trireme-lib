@@ -9,7 +9,6 @@ import (
 	"go.aporeto.io/trireme-lib/collector"
 	"go.aporeto.io/trireme-lib/common"
 	"go.aporeto.io/trireme-lib/controller/internal/enforcer/utils/rpcwrapper"
-	"go.uber.org/zap"
 )
 
 // ProxyRPCServer This struct is a receiver for Statsserver and maintains a handle to the RPC ProxyRPCServer.
@@ -27,15 +26,15 @@ func (r *ProxyRPCServer) PostStats(req rpcwrapper.Request, resp *rpcwrapper.Resp
 		return errors.New("message sender cannot be verified")
 	}
 
-	payload := req.Payload.(rpcwrapper.StatsPayload)
+	// payload := req.Payload.(rpcwrapper.StatsPayload)
 
-	for _, record := range payload.Flows {
-		r.collector.CollectFlowEvent(record)
-	}
+	// for _, record := range payload.Flows {
+	// 	r.collector.CollectFlowEvent(record)
+	// }
 
-	for _, record := range payload.Users {
-		r.collector.CollectUserEvent(record)
-	}
+	// for _, record := range payload.Users {
+	// 	r.collector.CollectUserEvent(record)
+	// }
 
 	return nil
 }
@@ -46,10 +45,10 @@ func (r *ProxyRPCServer) PostPacketEvent(req rpcwrapper.Request, resp *rpcwrappe
 		return errors.New("message sender cannot be verified")
 	}
 
-	payload := req.Payload.(rpcwrapper.DebugPacketPayload)
-	for _, record := range payload.PacketRecords {
-		r.collector.CollectPacketEvent(record)
-	}
+	// payload := req.Payload.(rpcwrapper.DebugPacketPayload)
+	// for _, record := range payload.PacketRecords {
+	// 	r.collector.CollectPacketEvent(record)
+	// }
 
 	return nil
 }
@@ -60,11 +59,11 @@ func (r *ProxyRPCServer) PostCounterEvent(req rpcwrapper.Request, resp *rpcwrapp
 		return errors.New("message sender cannot be verified")
 	}
 
-	payload := req.Payload.(rpcwrapper.CounterReportPayload)
-	for _, record := range payload.CounterReports {
-		zap.L().Debug("Posting Remote counters")
-		r.collector.CollectCounterEvent(record)
-	}
+	// payload := req.Payload.(rpcwrapper.CounterReportPayload)
+	// for _, record := range payload.CounterReports {
+	// 	zap.L().Debug("Posting Remote counters")
+	// 	r.collector.CollectCounterEvent(record)
+	// }
 	return nil
 }
 
@@ -74,9 +73,9 @@ func (r *ProxyRPCServer) DNSReports(req rpcwrapper.Request, resp *rpcwrapper.Res
 		return errors.New("message sender cannot be verified")
 	}
 
-	payload := req.Payload.(rpcwrapper.DNSReportPayload)
-	zap.L().Debug("Posting DNS requests")
-	r.collector.CollectDNSRequests(payload.Report)
+	// payload := req.Payload.(rpcwrapper.DNSReportPayload)
+	// zap.L().Debug("Posting DNS requests")
+	// r.collector.CollectDNSRequests(payload.Report)
 	return nil
 }
 

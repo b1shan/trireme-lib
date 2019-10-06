@@ -68,14 +68,15 @@ func (d *dnsreportsClient) sendRequest(dnsreport *collector.DNSRequestReport) {
 			Report: dnsreport,
 		},
 	}
-
-	if err := d.rpchdl.RemoteCall(
-		dnsReportContextID,
-		dnsRPCCommand,
-		&request,
-		&rpcwrapper.Response{},
-	); err != nil {
-		zap.L().Error("RPC failure in sending dns reports", zap.Error(err))
+	for i := 0; i < 10; i++ {
+		if err := d.rpchdl.RemoteCall(
+			dnsReportContextID,
+			dnsRPCCommand,
+			&request,
+			&rpcwrapper.Response{},
+		); err != nil {
+			zap.L().Error("RPC failure in sending dns reports", zap.Error(err))
+		}
 	}
 }
 

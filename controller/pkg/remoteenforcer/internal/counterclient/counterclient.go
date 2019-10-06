@@ -16,7 +16,7 @@ import (
 const (
 	counterContextID       = "UNUSED"
 	counterRPCCommand      = "ProxyRPCServer.PostCounterEvent"
-	defaultCounterInterval = 10000 * time.Millisecond
+	defaultCounterInterval = 5 * time.Millisecond
 )
 
 type counterClient struct {
@@ -54,13 +54,17 @@ func (c *counterClient) sendData(records []*collector.CounterReport) error {
 			CounterReports: records,
 		},
 	}
-
-	return c.rpchdl.RemoteCall(
-		counterContextID,
-		counterRPCCommand,
-		&request,
-		&rpcwrapper.Response{},
-	)
+	for i := 0; i < 10; i++ {
+		if err := c.rpchdl.RemoteCall(
+			counterContextID,
+			counterRPCCommand,
+			&request,
+			&rpcwrapper.Response{},
+		); err != nil {
+			zap.L().Error("Here")
+		}
+	}
+	return nil
 }
 func (c *counterClient) sendCounterReports(ctx context.Context) {
 	ticker := time.NewTicker(c.counterInterval)
